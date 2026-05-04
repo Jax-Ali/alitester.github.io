@@ -24,7 +24,9 @@ export function AuthForm() {
           window.location.href = '/dashboard';
         } else {
           await authService.signUp(email, password);
-          setSuccess('Check your email to confirm your account.');
+          // If confirm is OFF in Supabase, the user is created instantly.
+          setMode('login');
+          setSuccess('Account created successfully! You can now Sign in.');
         }
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Something went wrong.');

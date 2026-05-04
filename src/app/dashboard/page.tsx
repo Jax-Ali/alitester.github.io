@@ -1,20 +1,37 @@
-import { redirect } from 'next/navigation';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import type { Metadata } from 'next';
 import { supabase } from '@/lib/supabase';
 import { quizService } from '@/services/quiz.service';
 import { Header } from '@/components/layout/Header';
 import { QuizCard } from '@/components/quiz/QuizCard';
+import type { QuizRow } from '@/types/database';
 
-export const metadata: Metadata = {
-  title: 'Dashboard — Quiz Trainer',
-};
+export default function DashboardPage() {
+  const router = useRouter();
+  const [quizzes, setQuizzes] = useState<QuizRow[]>([]);
+  const [userEmail, setUserEmail] = useState<string>('');
+  const [loading, setLoading] = useState(true);
 
-export default async function DashboardPage() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/auth');
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) {
+        router.push('/auth');
+        return;
+      }
+      setUserEmail(user.email || '');
+      quizService.getByUser(user.id).then((data) => {
+        setQuizzes(data);
+        setLoading(false);
+      });
+    });
+  }, [router]);
 
-  const quizzes = await quizService.getByUser(user.id);
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -23,7 +40,7 @@ export default async function DashboardPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-xl font-semibold">My quizzes</h1>
-            <p className="text-sm text-zinc-500 mt-0.5">{user.email}</p>
+            <p className="text-sm text-zinc-500 mt-0.5">{userEmail}</p>
           </div>
           <Link
             href="/create"
