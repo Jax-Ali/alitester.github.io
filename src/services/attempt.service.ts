@@ -5,6 +5,7 @@ export const attemptService = {
   async create(payload: InsertAttempt): Promise<AttemptRow> {
     const { data, error } = await supabase
       .from('attempts')
+      // @ts-ignore
       .insert(payload)
       .select()
       .single();

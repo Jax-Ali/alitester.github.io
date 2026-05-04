@@ -45,16 +45,19 @@ export interface Database {
         Row: QuizRow;
         Insert: InsertQuiz;
         Update: Partial<Pick<QuizRow, 'title'>>;
+        Relationships: any[];
       };
       questions: {
         Row: QuestionRow;
         Insert: InsertQuestion;
         Update: Partial<InsertQuestion>;
+        Relationships: any[];
       };
       attempts: {
         Row: AttemptRow;
         Insert: InsertAttempt;
         Update: Partial<InsertAttempt>;
+        Relationships: any[];
       };
     };
     Views: Record<string, never>;
