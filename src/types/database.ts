@@ -49,12 +49,12 @@ export interface Database {
       questions: {
         Row: QuestionRow;
         Insert: InsertQuestion;
-        Update: never;
+        Update: Partial<InsertQuestion>;
       };
       attempts: {
         Row: AttemptRow;
         Insert: InsertAttempt;
-        Update: never;
+        Update: Partial<InsertAttempt>;
       };
     };
     Views: Record<string, never>;
