@@ -28,6 +28,13 @@ export interface AttemptRow {
   completed_at: string;
 }
 
+export interface UserRow {
+  id: string;
+  email: string;
+  is_admin: boolean;
+  created_at: string;
+}
+
 // ─── Insert types ─────────────────────────────────────────────────────────────
 
 export type InsertQuiz = Pick<QuizRow, 'title' | 'created_by'>;
@@ -41,6 +48,12 @@ export type InsertAttempt = Omit<AttemptRow, 'id' | 'completed_at'>;
 export interface Database {
   public: {
     Tables: {
+      users: {
+        Row: UserRow;
+        Insert: Partial<UserRow>;
+        Update: Partial<UserRow>;
+        Relationships: any[];
+      };
       quizzes: {
         Row: QuizRow;
         Insert: InsertQuiz;
