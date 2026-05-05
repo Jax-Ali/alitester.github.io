@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { Geist } from 'next/font/google';
+import { Montserrat } from 'next/font/google';
 import './globals.css';
 
-const geist = Geist({ subsets: ['latin'], variable: '--font-geist' });
+const montserrat = Montserrat({ subsets: ['latin', 'cyrillic', 'cyrillic-ext'], variable: '--font-montserrat' });
 
 export const metadata: Metadata = {
   title: 'Quiz Trainer',
@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geist.variable} h-full`}>
-      <body className="h-full bg-zinc-950 text-white antialiased font-[var(--font-geist)]">
+    <html lang="ru" className={`${montserrat.variable} h-full`}>
+      <body className="h-full bg-zinc-950 text-white antialiased font-[var(--font-montserrat)]">
         {children}
       </body>
     </html>

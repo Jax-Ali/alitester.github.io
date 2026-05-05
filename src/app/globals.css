@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --font-geist: 'Geist', system-ui, sans-serif;
+  --font-montserrat: 'Montserrat', system-ui, sans-serif;
 }
 
 * {
@@ -11,7 +11,7 @@
 body {
   background-color: #09090b; /* zinc-950 */
   color: #fafafa;
-  font-family: var(--font-geist);
+  font-family: var(--font-montserrat);
 }
 
 /* Subtle scrollbar for dark theme */
