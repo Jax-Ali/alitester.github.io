@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useTransition } from 'react';
 import { authService } from '@/services/auth.service';
+import { ru } from '@/lib/i18n/ru';
 
 export function Header() {
   const [isPending, startTransition] = useTransition();
@@ -28,14 +29,14 @@ export function Header() {
             href="/create"
             className="text-xs text-zinc-400 hover:text-white transition-colors"
           >
-            + New quiz
+            {ru.newQuiz}
           </Link>
           <button
             onClick={handleSignOut}
             disabled={isPending}
             className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors disabled:opacity-50"
           >
-            Sign out
+            {ru.signOut}
           </button>
         </nav>
       </div>

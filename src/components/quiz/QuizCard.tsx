@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { QuizRow } from '@/types';
+import { ru } from '@/lib/i18n/ru';
 
 interface QuizCardProps {
   quiz: QuizRow;
@@ -15,13 +16,13 @@ export function QuizCard({ quiz, questionCount }: QuizCardProps) {
         </h3>
         {questionCount !== undefined && (
           <span className="shrink-0 text-xs text-zinc-500 bg-white/5 border border-white/10 rounded-md px-2 py-0.5">
-            {questionCount}q
+            {questionCount} в.
           </span>
         )}
       </div>
 
       <p className="text-xs text-zinc-600">
-        {new Date(quiz.created_at).toLocaleDateString('en-US', {
+        {new Date(quiz.created_at).toLocaleDateString('ru-RU', {
           month: 'short',
           day: 'numeric',
           year: 'numeric',
@@ -32,7 +33,7 @@ export function QuizCard({ quiz, questionCount }: QuizCardProps) {
         href={`/quiz/${quiz.id}`}
         className="mt-auto w-full text-center text-xs font-medium py-2 rounded-lg bg-white/5 border border-white/10 text-zinc-300 hover:bg-white/10 hover:text-white transition-colors"
       >
-        Start quiz →
+        {ru.startQuiz}
       </Link>
     </div>
   );

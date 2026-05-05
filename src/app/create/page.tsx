@@ -67,7 +67,7 @@ export default function CreatePage() {
       return;
     }
     if (result.questions.length === 0) {
-      setErrors(['No valid questions found.']);
+      setErrors(['Не найдено ни одного правильного вопроса.']);
       return;
     }
     setErrors([]);
@@ -154,7 +154,7 @@ export default function CreatePage() {
 
         {errors.length > 0 && (
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
-            <p className="text-xs text-red-400 font-medium mb-2">Fix these errors:</p>
+            <p className="text-xs text-red-400 font-medium mb-2">Исправьте следующие ошибки:</p>
             <ul className="list-disc list-inside space-y-1">
               {errors.map((e, i) => (
                 <li key={i} className="text-xs text-red-400">{e}</li>

@@ -36,7 +36,7 @@ export function parseQuizText(raw: string): ParseResult {
     .filter(Boolean);
 
   if (blocks.length === 0) {
-    return { questions: [], errors: ['Input is empty.'] };
+    return { questions: [], errors: ['Текст пуст.'] };
   }
 
   blocks.forEach((block, i) => {
@@ -75,15 +75,15 @@ export function parseQuizText(raw: string): ParseResult {
 
     // Validate
     if (!text) {
-      errors.push(`Block ${blockNum}: Missing Q: line.`);
+      errors.push(`Блок ${blockNum}: Пропущена строка Q:`);
       return;
     }
     if (!options || options.length < 2) {
-      errors.push(`Block ${blockNum}: A: must have at least 2 options separated by "|".`);
+      errors.push(`Блок ${blockNum}: Строка A: должна содержать как минимум 2 варианта ответа, разделенных символом "|".`);
       return;
     }
     if (!correct_answers || correct_answers.length === 0) {
-      errors.push(`Block ${blockNum}: Missing C: line.`);
+      errors.push(`Блок ${blockNum}: Пропущена строка C:`);
       return;
     }
 
@@ -91,8 +91,8 @@ export function parseQuizText(raw: string): ParseResult {
     const invalid = correct_answers.filter((ca) => !options!.includes(ca));
     if (invalid.length > 0) {
       errors.push(
-        `Block ${blockNum}: Correct answer(s) [${invalid.join(', ')}] not found in A: options. ` +
-        `Check spelling — must match exactly.`
+        `Блок ${blockNum}: Правильные ответы [${invalid.join(', ')}] не найдены среди вариантов A:. ` +
+        `Проверьте орфографию — должно совпадать один в один.`
       );
       return;
     }

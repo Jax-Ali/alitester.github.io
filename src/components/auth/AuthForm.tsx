@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { authService } from '@/services/auth.service';
 import { Button } from '@/components/ui/Button';
+import { ru } from '@/lib/i18n/ru';
 
 export function AuthForm() {
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -26,10 +27,10 @@ export function AuthForm() {
           await authService.signUp(email, password);
           // If confirm is OFF in Supabase, the user is created instantly.
           setMode('login');
-          setSuccess('Account created successfully! You can now Sign in.');
+          setSuccess(ru.accountCreated);
         }
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Something went wrong.');
+        setError(err instanceof Error ? err.message : ru.somethingWentWrong);
       }
     });
   };
@@ -40,19 +41,19 @@ export function AuthForm() {
   return (
     <div className="w-full max-w-sm">
       <h1 className="text-2xl font-semibold mb-1">
-        {mode === 'login' ? 'Sign in' : 'Create account'}
+        {mode === 'login' ? ru.signIn : ru.createAccount}
       </h1>
       <p className="text-zinc-500 text-sm mb-8">
         {mode === 'login'
-          ? 'Welcome back to Quiz Trainer.'
-          : 'Start training for your exams.'}
+          ? ru.welcomeBack
+          : ru.startTraining}
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <input
           id="email"
           type="email"
-          placeholder="Email"
+          placeholder={ru.email}
           required
           autoComplete="email"
           value={email}
@@ -62,7 +63,7 @@ export function AuthForm() {
         <input
           id="password"
           type="password"
-          placeholder="Password"
+          placeholder={ru.password}
           required
           autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
           minLength={6}
@@ -83,18 +84,18 @@ export function AuthForm() {
         )}
 
         <Button type="submit" loading={isPending} className="w-full mt-1">
-          {mode === 'login' ? 'Sign in' : 'Create account'}
+          {mode === 'login' ? ru.signIn : ru.createAccount}
         </Button>
       </form>
 
       <p className="text-sm text-zinc-500 mt-6 text-center">
-        {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}{' '}
+        {mode === 'login' ? ru.noAccount : ru.hasAccount}{' '}
         <button
           type="button"
           onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(null); setSuccess(null); }}
           className="text-zinc-300 hover:text-white transition-colors underline-offset-2 hover:underline"
         >
-          {mode === 'login' ? 'Register' : 'Sign in'}
+          {mode === 'login' ? ru.register : ru.signIn}
         </button>
       </p>
     </div>
