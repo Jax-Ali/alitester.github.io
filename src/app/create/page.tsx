@@ -27,6 +27,11 @@ export default function CreatePage() {
   const [isPending, startTransition] = useTransition();
 
   const handleCreate = () => {
+    if (!title.trim()) {
+      setErrors(['Название теста обязательно.']);
+      return;
+    }
+
     const result = parseQuizText(text);
     if (result.errors.length > 0) {
       setErrors(result.errors);
@@ -43,7 +48,7 @@ export default function CreatePage() {
       if (!user) { router.push('/auth'); return; }
 
       const quiz = await quizService.create({
-        title: title.trim() || `Quiz ${new Date().toLocaleDateString()}`,
+        title: title.trim(),
         created_by: user.id,
       });
 
@@ -85,9 +90,10 @@ export default function CreatePage() {
         <input
           id="quiz-title"
           type="text"
-          placeholder="Quiz title (optional)"
+          placeholder="Введите название теста"
+          required
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => { setTitle(e.target.value); setErrors([]); }}
           className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-white/20 transition-colors"
         />
 
