@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from 'react';
 import type { QuestionRow } from '@/types';
-import { Button } from '@/components/ui/Button';
 
 interface QuestionPlayerProps {
   questions: QuestionRow[];
@@ -123,20 +122,20 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
 
         <div className="w-full flex gap-4">
           {!checked ? (
-            <Button 
-              onClick={handleCheck} 
-              disabled={selected.length === 0} 
-              className="w-full text-base py-6 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-500 text-white border-0 shadow-lg shadow-indigo-600/20"
+            <button
+              onClick={handleCheck}
+              disabled={selected.length === 0}
+              className="w-full flex items-center justify-center text-base py-4 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-500 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-600/20"
             >
               Check Answer
-            </Button>
+            </button>
           ) : (
-            <Button 
-              onClick={handleNext} 
-              className="w-full text-base py-6 rounded-xl font-bold bg-white text-zinc-900 hover:bg-zinc-200 border-0 shadow-lg shadow-white/10"
+            <button
+              onClick={handleNext}
+              className="w-full flex items-center justify-center text-base py-4 rounded-xl font-bold bg-white text-zinc-900 hover:bg-zinc-200 transition-colors shadow-lg shadow-white/10"
             >
               {isLast ? 'Finish Quiz 🎉' : 'Next Question →'}
-            </Button>
+            </button>
           )}
         </div>
       </div>
