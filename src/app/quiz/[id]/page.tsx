@@ -104,12 +104,18 @@ function QuizPageLoader({ params, searchParams }: PageProps) {
       const { id } = await params;
       const { retry } = await searchParams;
 
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        window.location.href = `/auth?redirect=/quiz/${id}`;
+        return;
+      }
+
       const [quiz, questions] = await Promise.all([
         quizService.getById(id),
         quizService.getQuestions(id),
       ]);
 
-      if (!quiz) { setError('Quiz not found.'); return; }
+      if (!quiz) { setError(ru.quizNotFound); return; }
 
       const retryIds = retry ? retry.split(',') : undefined;
       setData({ quiz, questions, retryIds });

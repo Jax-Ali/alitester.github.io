@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { authService } from '@/services/auth.service';
 import { Button } from '@/components/ui/Button';
 import { ru } from '@/lib/i18n/ru';
@@ -12,6 +13,8 @@ export function AuthForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get('redirect') || '/dashboard';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +25,7 @@ export function AuthForm() {
       try {
         if (mode === 'login') {
           await authService.signIn(email, password);
-          window.location.href = '/dashboard';
+          window.location.href = redirectUrl;
         } else {
           await authService.signUp(email, password);
           // If confirm is OFF in Supabase, the user is created instantly.

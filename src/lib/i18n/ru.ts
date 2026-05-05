@@ -57,4 +57,6 @@ export const ru = {
   register: "Регистрация",
   accountCreated: "Аккаунт успешно создан! Теперь вы можете войти.",
   somethingWentWrong: "Что-то пошло не так.",
+  copyLink: "Поделиться",
+  linkCopied: "Скопировано!",
 };
