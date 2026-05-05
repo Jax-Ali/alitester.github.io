@@ -50,7 +50,18 @@ export function QuizClient({ quiz, questions, retryIds }: QuizClientProps) {
   }
 
   return (
-    <div className="flex flex-col items-center justify-start pt-12 px-4 min-h-screen">
+    <div className="flex flex-col items-center justify-start pt-12 px-4 min-h-screen relative">
+      <button
+        onClick={() => {
+          if (window.confirm('Вы уверены, что хотите выйти?')) {
+            router.push('/dashboard');
+          }
+        }}
+        className="absolute top-6 left-6 text-sm text-zinc-500 hover:text-white transition-colors"
+      >
+        ← Exit
+      </button>
+
       <div className="w-full max-w-xl mb-8">
         <h1 className="text-base font-medium text-white">{quiz.title}</h1>
         {retryIds && (
