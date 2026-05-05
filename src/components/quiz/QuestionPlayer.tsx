@@ -82,10 +82,20 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
       </div>
 
       {/* Question */}
-      <div className="text-center px-4">
-        <p className="text-sm font-semibold text-indigo-400 mb-4 uppercase tracking-widest">
-          {isMultiple ? 'Select multiple answers' : 'Select one answer'}
-        </p>
+      <div className="text-center px-4 flex flex-col items-center">
+        <div className="flex items-center gap-3 mb-4">
+          <p className="text-sm font-semibold text-indigo-400 uppercase tracking-widest">
+            {isMultiple ? 'Select multiple answers' : 'Select one answer'}
+          </p>
+          <div 
+            className="flex items-center gap-1"
+            title="Количество правильных ответов"
+          >
+            {Array.from({ length: question.correct_answers.length }).map((_, i) => (
+              <span key={i} className="text-emerald-400 text-xs leading-none">●</span>
+            ))}
+          </div>
+        </div>
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-relaxed md:leading-relaxed mx-auto max-w-3xl">
           {question.text}
         </h2>
