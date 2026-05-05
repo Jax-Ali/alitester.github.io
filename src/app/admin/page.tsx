@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Header } from '@/components/layout/Header';
 import type { UserRow, QuizRow } from '@/types/database';
+import { ru } from '@/lib/i18n/ru';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -73,14 +74,14 @@ export default function AdminPage() {
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-10 flex flex-col md:flex-row gap-8 items-start">
         {/* Users List */}
         <div className="flex-1 w-full">
-          <h1 className="text-xl font-semibold mb-6">Users</h1>
+          <h1 className="text-xl font-semibold mb-6">{ru.users}</h1>
           <div className="border border-white/10 rounded-xl overflow-hidden overflow-x-auto bg-white/[0.02]">
             <table className="w-full text-left text-sm text-zinc-300">
               <thead className="bg-white/5 border-b border-white/10 text-xs uppercase text-zinc-500">
                 <tr>
                   <th className="px-4 py-3 font-medium">Email</th>
-                  <th className="px-4 py-3 font-medium">Role</th>
-                  <th className="px-4 py-3 font-medium">Joined</th>
+                  <th className="px-4 py-3 font-medium">{ru.role}</th>
+                  <th className="px-4 py-3 font-medium">{ru.joined}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -101,7 +102,7 @@ export default function AdminPage() {
                             : 'bg-white/5 text-zinc-400 border border-white/10'
                         }`}
                       >
-                        {u.is_admin ? 'Admin' : 'User'}
+                        {u.is_admin ? ru.admin : ru.user}
                       </span>
                     </td>
                     <td className="px-4 py-3">
@@ -118,10 +119,10 @@ export default function AdminPage() {
         <div className="flex-1 w-full">
           {selectedUserId ? (
             <div className="sticky top-10">
-              <h2 className="text-xl font-semibold mb-6">User Quizzes</h2>
+              <h2 className="text-xl font-semibold mb-6">{ru.userQuizzes}</h2>
               {userQuizzes.length === 0 ? (
                 <div className="text-center py-12 border border-dashed border-white/10 rounded-xl">
-                  <p className="text-sm text-zinc-500">This user has no quizzes yet.</p>
+                  <p className="text-sm text-zinc-500">{ru.userNoQuizzes}</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
@@ -140,7 +141,7 @@ export default function AdminPage() {
                         onClick={() => router.push(`/quiz/${quiz.id}`)}
                         className="text-xs bg-white text-zinc-900 px-4 py-2 rounded-lg font-medium hover:bg-zinc-200 transition-colors"
                       >
-                        Open
+                        {ru.open}
                       </button>
                     </div>
                   ))}
@@ -149,7 +150,7 @@ export default function AdminPage() {
             </div>
           ) : (
             <div className="text-sm text-center text-zinc-500 py-20 border border-dashed border-white/10 rounded-xl mt-[52px]">
-              Select a user from the list to view their quizzes.
+              {ru.selectUserHelp}
             </div>
           )}
         </div>

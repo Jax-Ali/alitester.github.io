@@ -7,6 +7,7 @@ import { quizService } from '@/services/quiz.service';
 import { attemptService } from '@/services/attempt.service';
 import { supabase } from '@/lib/supabase';
 import type { QuizRow, QuestionRow } from '@/types';
+import { ru } from '@/lib/i18n/ru';
 
 interface QuizClientProps {
   quiz: QuizRow;
@@ -44,7 +45,7 @@ export function QuizClient({ quiz, questions, retryIds }: QuizClientProps) {
   if (activeQuestions.length === 0) {
     return (
       <div className="text-center text-zinc-500 text-sm py-20">
-        No questions to show.
+        {ru.noQuestions}
       </div>
     );
   }
@@ -53,21 +54,21 @@ export function QuizClient({ quiz, questions, retryIds }: QuizClientProps) {
     <div className="flex flex-col items-center justify-center p-6 min-h-screen relative bg-gradient-to-br from-zinc-900 via-black to-zinc-950">
       <button
         onClick={() => {
-          if (window.confirm('Вы уверены, что хотите выйти?')) {
+          if (window.confirm(ru.confirmExit)) {
             router.push('/dashboard');
           }
         }}
         className="absolute top-6 left-6 text-sm text-zinc-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-4 py-2 rounded-lg flex items-center gap-2 backdrop-blur-sm"
       >
-        ← Exit
+        ← {ru.back}
       </button>
 
-      <div className="w-full max-w-4xl w-full flex flex-col items-center gap-8">
+      <div className="w-full max-w-4xl mx-auto px-4 flex flex-col items-center gap-8">
         <div className="w-full text-center">
           <p className="text-sm font-medium text-zinc-500 uppercase tracking-widest mb-2">{quiz.title}</p>
           {retryIds && (
             <span className="inline-block px-3 py-1 bg-red-500/10 text-red-400 text-xs rounded-full border border-red-500/20">
-              Retrying {activeQuestions.length} wrong answer(s)
+              {ru.retryWrong(activeQuestions.length)}
             </span>
           )}
         </div>
@@ -75,7 +76,7 @@ export function QuizClient({ quiz, questions, retryIds }: QuizClientProps) {
         <QuestionPlayer questions={activeQuestions} onComplete={handleComplete} />
         
         {isPending && (
-          <p className="mt-4 text-sm text-zinc-500 animate-pulse text-center">Saving result…</p>
+          <p className="mt-4 text-sm text-zinc-500 animate-pulse text-center">{ru.savingResult}</p>
         )}
       </div>
     </div>

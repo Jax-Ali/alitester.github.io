@@ -6,6 +6,7 @@ import { parseQuizText } from '@/utils/quizParser';
 import { quizService } from '@/services/quiz.service';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/Button';
+import { ru } from '@/lib/i18n/ru';
 
 const EXAMPLE = `Q: What is the capital of France?
 A: Berlin | Paris | Rome | Madrid
@@ -100,9 +101,9 @@ export default function CreatePage() {
   return (
     <div className="min-h-screen max-w-2xl mx-auto px-4 py-12 flex flex-col gap-8">
       <div>
-        <h1 className="text-xl font-semibold">Create a quiz</h1>
+        <h1 className="text-xl font-semibold">{ru.createQuizTitle}</h1>
         <p className="text-sm text-zinc-500 mt-1">
-          Paste questions in the format below. Blank line between each question.
+          {ru.createQuizDesc}
         </p>
       </div>
 
@@ -164,7 +165,7 @@ export default function CreatePage() {
 
         <div className="flex gap-3">
           <Button onClick={() => router.back()} variant="ghost">
-            Cancel
+            {ru.cancel}
           </Button>
           <Button
             onClick={handleCreate}
@@ -172,7 +173,7 @@ export default function CreatePage() {
             disabled={!text.trim()}
             className="flex-1"
           >
-            Create quiz
+            {ru.createQuiz}
           </Button>
         </div>
       </div>

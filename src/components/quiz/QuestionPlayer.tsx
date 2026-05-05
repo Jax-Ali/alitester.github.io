@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import type { QuestionRow } from '@/types';
+import { ru } from '@/lib/i18n/ru';
 
 interface QuestionPlayerProps {
   questions: QuestionRow[];
@@ -43,7 +44,7 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
 
   const getOptionStyle = (opt: string) => {
     const base =
-      'w-full text-left p-6 sm:p-8 rounded-2xl border-2 text-base sm:text-lg font-medium transition-all duration-200 shadow-sm';
+      'w-full flex items-center justify-center text-center px-4 py-6 min-h-[100px] rounded-2xl border-2 text-base sm:text-lg font-medium transition-all duration-200 shadow-sm cursor-pointer';
 
     if (!checked) {
       return `${base} ${
@@ -60,7 +61,7 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
       return `${base} border-emerald-500 bg-emerald-500/20 text-emerald-100 shadow-emerald-500/10 shadow-lg scale-[1.02]`;
     if (isSelected && !isCorrect)
       return `${base} border-red-500 bg-red-500/20 text-red-100 shadow-red-500/10 shadow-lg scale-[1.02]`;
-    return `${base} border-white/5 bg-white/[0.02] text-zinc-600 opacity-50`;
+    return `${base} border-white/5 bg-white/[0.02] text-zinc-600 opacity-50 cursor-default`;
   };
 
   return (
@@ -85,7 +86,7 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
       <div className="text-center px-4 flex flex-col items-center">
         <div className="flex items-center gap-3 mb-4">
           <p className="text-sm font-semibold text-indigo-400 uppercase tracking-widest">
-            {isMultiple ? 'Select multiple answers' : 'Select one answer'}
+            {isMultiple ? ru.selectMultiple : ru.selectOne}
           </p>
           <div 
             className="flex items-center gap-1"
@@ -108,8 +109,9 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
             key={opt}
             onClick={() => toggleOption(opt)}
             className={getOptionStyle(opt)}
+            disabled={checked}
           >
-            {opt}
+            <span className="max-w-[90%] break-words">{opt}</span>
           </button>
         ))}
       </div>
@@ -125,8 +127,8 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
           }`}>
             {question.correct_answers.every((a) => selected.includes(a)) &&
             selected.length === question.correct_answers.length
-              ? '✨ Fantastic! Correct answer.'
-              : `Ой! Правильный ответ: ${question.correct_answers.join(', ')}`}
+              ? ru.fantastic
+              : ru.oopsCorrect(question.correct_answers.join(', '))}
           </div>
         )}
 
@@ -137,14 +139,14 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
               disabled={selected.length === 0}
               className="w-full flex items-center justify-center text-base py-4 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-500 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-600/20"
             >
-              Check Answer
+              {ru.checkAnswer}
             </button>
           ) : (
             <button
               onClick={handleNext}
               className="w-full flex items-center justify-center text-base py-4 rounded-xl font-bold bg-white text-zinc-900 hover:bg-zinc-200 transition-colors shadow-lg shadow-white/10"
             >
-              {isLast ? 'Finish Quiz 🎉' : 'Next Question →'}
+              {isLast ? ru.finishQuiz : ru.nextQuestion}
             </button>
           )}
         </div>

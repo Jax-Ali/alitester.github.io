@@ -7,6 +7,7 @@ import { attemptService } from '@/services/attempt.service';
 import { quizService } from '@/services/quiz.service';
 import type { AttemptRow, QuestionRow, QuizRow } from '@/types';
 import { Button } from '@/components/ui/Button';
+import { ru } from '@/lib/i18n/ru';
 
 interface PageProps {
   params: Promise<{ attemptId: string }>;
@@ -26,13 +27,13 @@ export default function ResultPage({ params }: PageProps) {
     (async () => {
       const { attemptId } = await params;
       const attempt = await attemptService.getById(attemptId);
-      if (!attempt) { setError('Result not found.'); return; }
+      if (!attempt) { setError(ru.resultNotFound); return; }
 
       const [quiz, questions] = await Promise.all([
         quizService.getById(attempt.quiz_id),
         quizService.getQuestions(attempt.quiz_id),
       ]);
-      if (!quiz) { setError('Quiz not found.'); return; }
+      if (!quiz) { setError(ru.quizNotFound); return; }
 
       const wrongQuestions = questions.filter((q) =>
         attempt.wrong_questions.includes(q.id)
@@ -76,17 +77,17 @@ export default function ResultPage({ params }: PageProps) {
           {attempt.score}%
         </div>
         <h1 className="text-xl font-semibold">
-          {passed ? 'Well done!' : 'Keep practicing'}
+          {passed ? ru.wellDone : ru.keepPracticing}
         </h1>
         <p className="text-sm text-zinc-500 mt-1">
-          {quiz.title} · {questions.length - wrongQuestions.length} / {questions.length} correct
+          {quiz.title} · {ru.correctCount(questions.length - wrongQuestions.length, questions.length)}
         </p>
       </div>
 
       {/* Wrong answers */}
       {wrongQuestions.length > 0 && (
         <div className="flex flex-col gap-3">
-          <h2 className="text-sm font-medium text-zinc-400">Wrong answers</h2>
+          <h2 className="text-sm font-medium text-zinc-400">{ru.wrongAnswers}</h2>
           {wrongQuestions.map((q) => {
             const userAnswer = attempt.answers?.[q.id] ?? [];
             return (
@@ -97,10 +98,10 @@ export default function ResultPage({ params }: PageProps) {
                 <p className="text-sm text-white">{q.text}</p>
                 <div className="text-xs space-y-1">
                   <p className="text-red-400">
-                    Your answer: {userAnswer.length > 0 ? userAnswer.join(', ') : '—'}
+                    {ru.yourAnswer} {userAnswer.length > 0 ? userAnswer.join(', ') : '—'}
                   </p>
                   <p className="text-emerald-400">
-                    Correct: {q.correct_answers.join(', ')}
+                    {ru.correctAnswer} {q.correct_answers.join(', ')}
                   </p>
                 </div>
               </div>
@@ -113,7 +114,7 @@ export default function ResultPage({ params }: PageProps) {
       <div className="flex flex-col gap-2">
         {wrongQuestions.length > 0 && (
           <Button onClick={() => router.push(retryUrl)} className="w-full">
-            Retry wrong answers ({wrongQuestions.length})
+            {ru.retryWrongBtn(wrongQuestions.length)}
           </Button>
         )}
         <Button
@@ -121,13 +122,13 @@ export default function ResultPage({ params }: PageProps) {
           variant="ghost"
           className="w-full"
         >
-          Restart full quiz
+          {ru.restartFull}
         </Button>
         <Link
           href="/dashboard"
           className="text-sm text-center text-zinc-500 hover:text-zinc-300 transition-colors mt-1"
         >
-          ← Back to dashboard
+          ← {ru.backToDashboard}
         </Link>
       </div>
     </div>

@@ -8,6 +8,7 @@ import { quizService } from '@/services/quiz.service';
 import { Header } from '@/components/layout/Header';
 import { QuizCard } from '@/components/quiz/QuizCard';
 import type { QuizRow } from '@/types/database';
+import { ru } from '@/lib/i18n/ru';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function DashboardPage() {
   }, [router]);
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return <div className="min-h-screen flex items-center justify-center">{ru.loading}</div>;
   }
 
   return (
@@ -39,25 +40,25 @@ export default function DashboardPage() {
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-10">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-xl font-semibold">My quizzes</h1>
+            <h1 className="text-xl font-semibold">{ru.myQuizzes}</h1>
             <p className="text-sm text-zinc-500 mt-0.5">{userEmail}</p>
           </div>
           <Link
             href="/create"
             className="text-sm px-4 py-2 bg-white text-zinc-900 rounded-lg font-medium hover:bg-zinc-200 transition-colors"
           >
-            + New quiz
+            {ru.newQuiz}
           </Link>
         </div>
 
         {quizzes.length === 0 ? (
           <div className="text-center py-20 border border-dashed border-white/10 rounded-xl">
-            <p className="text-zinc-500 text-sm">No quizzes yet.</p>
+            <p className="text-zinc-500 text-sm">{ru.noQuizzesYet}</p>
             <Link
               href="/create"
               className="inline-block mt-4 text-sm text-zinc-300 hover:text-white underline-offset-2 hover:underline transition-colors"
             >
-              Create your first quiz →
+              {ru.createFirstQuiz}
             </Link>
           </div>
         ) : (
