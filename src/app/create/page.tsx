@@ -19,12 +19,39 @@ Q: What does HTML stand for?
 A: HyperText Markup Language | High Text Machine Language | HyperText Machine Language | HyperText Markup Level
 C: HyperText Markup Language`;
 
+const CHATGPT_PROMPT = `Преобразуй следующий текст теста в строгий формат:
+
+Требования:
+- Каждый вопрос начинается с "Q:"
+- Варианты ответов начинаются с "A:"
+- Варианты разделяются символом "|"
+- Правильный ответ указывается через "C:"
+- Если несколько правильных ответов — перечисли их через запятую
+- Между вопросами должна быть пустая строка
+
+Пример формата:
+
+Q: Вопрос
+A: вариант1 | вариант2 | вариант3 | вариант4
+C: правильный ответ
+
+Теперь преобразуй следующий текст:
+
+"`;
+
 export default function CreatePage() {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
+  const [copied, setCopied] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  const handleCopyPrompt = () => {
+    navigator.clipboard.writeText(CHATGPT_PROMPT);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleCreate = () => {
     if (!title.trim()) {
@@ -78,12 +105,29 @@ export default function CreatePage() {
         </p>
       </div>
 
-      {/* Format reference */}
-      <div className="bg-white/[0.03] border border-white/10 rounded-xl p-4">
-        <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Format</p>
-        <pre className="text-xs text-zinc-400 font-mono leading-relaxed whitespace-pre-wrap">
-          {`Q: Your question\nA: Option 1 | Option 2 | Option 3 | Option 4\nC: Correct option (exact match)\n\n(blank line between questions)`}
-        </pre>
+      {/* AI Prompt Guide */}
+      <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-6 flex flex-col gap-4">
+        <div>
+          <h2 className="text-sm font-semibold text-indigo-400 mb-1">🤖 Как быстро создать тест через ИИ</h2>
+          <ol className="text-xs text-zinc-400 list-decimal list-inside space-y-1">
+            <li>Нажми кнопку ниже, чтобы скопировать специальный промпт</li>
+            <li>Открой ChatGPT (или любой другой ИИ) и вставь промпт</li>
+            <li>Сразу после промпта вставь свой сырой текст/конспект и отправь</li>
+            <li>Скопируй результат от ИИ и вставь его в большое поле ниже!</li>
+          </ol>
+        </div>
+        
+        <div className="bg-black/40 rounded-lg p-4 relative group">
+          <pre className="text-xs text-zinc-500 font-mono whitespace-pre-wrap leading-relaxed">
+            {CHATGPT_PROMPT}
+          </pre>
+          <button
+            onClick={handleCopyPrompt}
+            className="absolute top-3 right-3 bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-md transition-colors font-medium border border-white/10 backdrop-blur-md"
+          >
+            {copied ? '✅ Скопировано!' : '📋 Скопировать промпт'}
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-4">
