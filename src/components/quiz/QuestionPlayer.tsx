@@ -91,38 +91,41 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
         </span>
       </div>
 
-      {/* Question */}
-      <div className="text-center px-4 flex flex-col items-center">
-        <div className="flex items-center gap-3 mb-4">
-          <p className="text-sm font-semibold text-indigo-400 uppercase tracking-widest">
-            {isMultiple ? ru.selectMultiple : ru.selectOne}
-          </p>
-          <div 
-            className="flex items-center gap-1"
-            title="Количество правильных ответов"
-          >
-            {Array.from({ length: question.correct_answers.length }).map((_, i) => (
-              <span key={i} className="text-emerald-400 text-xs leading-none">●</span>
-            ))}
+      {/* Question and Options with Transition */}
+      <div key={index} className="animate-slide-fade w-full flex flex-col gap-10 sm:gap-14">
+        {/* Question */}
+        <div className="text-center px-4 flex flex-col items-center">
+          <div className="flex items-center gap-3 mb-4">
+            <p className="text-sm font-semibold text-indigo-400 uppercase tracking-widest">
+              {isMultiple ? ru.selectMultiple : ru.selectOne}
+            </p>
+            <div 
+              className="flex items-center gap-1"
+              title="Количество правильных ответов"
+            >
+              {Array.from({ length: question.correct_answers.length }).map((_, i) => (
+                <span key={i} className="text-emerald-400 text-xs leading-none">●</span>
+              ))}
+            </div>
           </div>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-relaxed md:leading-relaxed mx-auto max-w-3xl">
+            {question.text}
+          </h2>
         </div>
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-relaxed md:leading-relaxed mx-auto max-w-3xl">
-          {question.text}
-        </h2>
-      </div>
 
-      {/* Options */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full max-w-4xl mx-auto">
-        {question.options.map((opt) => (
-          <button
-            key={opt}
-            onClick={() => toggleOption(opt)}
-            className={getOptionStyle(opt)}
-            disabled={checked}
-          >
-            <span className="max-w-[90%] break-words">{opt}</span>
-          </button>
-        ))}
+        {/* Options */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full max-w-4xl mx-auto">
+          {question.options.map((opt) => (
+            <button
+              key={opt}
+              onClick={() => toggleOption(opt)}
+              className={getOptionStyle(opt)}
+              disabled={checked}
+            >
+              <span className="max-w-[90%] break-words">{opt}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Feedback & Actions */}
