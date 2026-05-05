@@ -57,11 +57,19 @@ export function parseQuizText(raw: string): ParseResult {
           .map((o) => o.trim())
           .filter(Boolean);
       } else if (/^C:/i.test(line)) {
-        correct_answers = line
-          .replace(/^C:\s*/i, '')
-          .split(',')
-          .map((c) => c.trim())
-          .filter(Boolean);
+        const cText = line.replace(/^C:\s*/i, '').trim();
+        
+        // If the entire C text perfectly matches a single option, don't split it.
+        // This solves the bug where a single option containing commas was incorrectly split.
+        if (options && options.includes(cText)) {
+          correct_answers = [cText];
+        } else if (cText.includes('|')) {
+          // If they used pipe separator for multiple answers
+          correct_answers = cText.split('|').map((c) => c.trim()).filter(Boolean);
+        } else {
+          // Fallback: split by comma for multiple correct answers
+          correct_answers = cText.split(',').map((c) => c.trim()).filter(Boolean);
+        }
       }
     }
 
