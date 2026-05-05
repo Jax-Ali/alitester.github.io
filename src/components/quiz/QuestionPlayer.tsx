@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { QuestionRow } from '@/types';
 import { ru } from '@/lib/i18n/ru';
 
@@ -30,7 +30,7 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
 
   const handleCheck = () => setChecked(true);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     const nextAnswers = { ...answers, [question.id]: selected };
     if (isLast) {
       onComplete(nextAnswers);
@@ -40,7 +40,16 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
       setChecked(false);
       setIndex((i) => i + 1);
     }
-  };
+  }, [answers, question.id, selected, isLast, onComplete]);
+
+  useEffect(() => {
+    if (checked) {
+      const timer = setTimeout(() => {
+        handleNext();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [checked, handleNext]);
 
   const getOptionStyle = (opt: string) => {
     const base =
