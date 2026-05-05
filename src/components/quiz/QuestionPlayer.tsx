@@ -44,13 +44,13 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
 
   const getOptionStyle = (opt: string) => {
     const base =
-      'w-full text-left px-4 py-3 rounded-lg border text-sm transition-colors';
+      'w-full text-left p-6 sm:p-8 rounded-2xl border-2 text-base sm:text-lg font-medium transition-all duration-200 shadow-sm';
 
     if (!checked) {
       return `${base} ${
         selected.includes(opt)
-          ? 'border-white/40 bg-white/10 text-white'
-          : 'border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10'
+          ? 'border-indigo-500 bg-indigo-500/20 text-indigo-100 shadow-indigo-500/10 scale-[1.02] shadow-xl'
+          : 'border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] hover:shadow-lg'
       }`;
     }
 
@@ -58,39 +58,42 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
     const isSelected = selected.includes(opt);
 
     if (isCorrect)
-      return `${base} border-emerald-500/50 bg-emerald-500/10 text-emerald-300`;
+      return `${base} border-emerald-500 bg-emerald-500/20 text-emerald-100 shadow-emerald-500/10 shadow-lg scale-[1.02]`;
     if (isSelected && !isCorrect)
-      return `${base} border-red-500/50 bg-red-500/10 text-red-300`;
-    return `${base} border-white/5 bg-white/[0.03] text-zinc-500`;
+      return `${base} border-red-500 bg-red-500/20 text-red-100 shadow-red-500/10 shadow-lg scale-[1.02]`;
+    return `${base} border-white/5 bg-white/[0.02] text-zinc-600 opacity-50`;
   };
 
   return (
-    <div className="w-full max-w-xl flex flex-col gap-6">
+    <div className="w-full flex flex-col gap-10 sm:gap-14">
       {/* Progress */}
-      <div className="flex items-center gap-3">
-        <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+      <div className="flex items-center gap-4 max-w-lg mx-auto w-full">
+        <span className="text-sm font-semibold text-zinc-500 shrink-0 w-8 text-right">
+          {index + 1}
+        </span>
+        <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden shadow-inner">
           <div
-            className="h-full bg-white/60 rounded-full transition-all duration-300"
+            className="h-full bg-indigo-500 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${((index + 1) / questions.length) * 100}%` }}
           />
         </div>
-        <span className="text-xs text-zinc-500 shrink-0">
-          {index + 1} / {questions.length}
+        <span className="text-sm font-semibold text-zinc-500 shrink-0 w-8">
+          {questions.length}
         </span>
       </div>
 
       {/* Question */}
-      <div>
-        <p className="text-xs text-zinc-500 mb-2 uppercase tracking-wider">
-          {isMultiple ? 'Select all that apply' : 'Select one'}
+      <div className="text-center px-4">
+        <p className="text-sm font-semibold text-indigo-400 mb-4 uppercase tracking-widest">
+          {isMultiple ? 'Select multiple answers' : 'Select one answer'}
         </p>
-        <h2 className="text-lg font-medium text-white leading-snug">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-relaxed md:leading-relaxed mx-auto max-w-3xl">
           {question.text}
         </h2>
       </div>
 
       {/* Options */}
-      <div className="flex flex-col gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full max-w-4xl mx-auto">
         {question.options.map((opt) => (
           <button
             key={opt}
@@ -102,32 +105,40 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
         ))}
       </div>
 
-      {/* Feedback */}
-      {checked && (
-        <p className={`text-sm ${
-          question.correct_answers.every((a) => selected.includes(a)) &&
-          selected.length === question.correct_answers.length
-            ? 'text-emerald-400'
-            : 'text-red-400'
-        }`}>
-          {question.correct_answers.every((a) => selected.includes(a)) &&
-          selected.length === question.correct_answers.length
-            ? '✓ Correct'
-            : `✗ Correct: ${question.correct_answers.join(', ')}`}
-        </p>
-      )}
-
-      {/* Actions */}
-      <div className="flex gap-2">
-        {!checked ? (
-          <Button onClick={handleCheck} disabled={selected.length === 0} className="flex-1">
-            Check
-          </Button>
-        ) : (
-          <Button onClick={handleNext} className="flex-1">
-            {isLast ? 'Finish' : 'Next →'}
-          </Button>
+      {/* Feedback & Actions */}
+      <div className="w-full max-w-lg mx-auto flex flex-col gap-6 items-center">
+        {checked && (
+          <div className={`text-center px-6 py-4 rounded-2xl w-full font-medium ${
+            question.correct_answers.every((a) => selected.includes(a)) &&
+            selected.length === question.correct_answers.length
+              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+              : 'bg-red-500/10 text-red-400 border border-red-500/20'
+          }`}>
+            {question.correct_answers.every((a) => selected.includes(a)) &&
+            selected.length === question.correct_answers.length
+              ? '✨ Fantastic! Correct answer.'
+              : `Ой! Правильный ответ: ${question.correct_answers.join(', ')}`}
+          </div>
         )}
+
+        <div className="w-full flex gap-4">
+          {!checked ? (
+            <Button 
+              onClick={handleCheck} 
+              disabled={selected.length === 0} 
+              className="w-full text-base py-6 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-500 text-white border-0 shadow-lg shadow-indigo-600/20"
+            >
+              Check Answer
+            </Button>
+          ) : (
+            <Button 
+              onClick={handleNext} 
+              className="w-full text-base py-6 rounded-xl font-bold bg-white text-zinc-900 hover:bg-zinc-200 border-0 shadow-lg shadow-white/10"
+            >
+              {isLast ? 'Finish Quiz 🎉' : 'Next Question →'}
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

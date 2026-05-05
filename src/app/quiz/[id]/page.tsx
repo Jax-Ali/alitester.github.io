@@ -50,28 +50,34 @@ export function QuizClient({ quiz, questions, retryIds }: QuizClientProps) {
   }
 
   return (
-    <div className="flex flex-col items-center justify-start pt-12 px-4 min-h-screen relative">
+    <div className="flex flex-col items-center justify-center p-6 min-h-screen relative bg-gradient-to-br from-zinc-900 via-black to-zinc-950">
       <button
         onClick={() => {
           if (window.confirm('Вы уверены, что хотите выйти?')) {
             router.push('/dashboard');
           }
         }}
-        className="absolute top-6 left-6 text-sm text-zinc-500 hover:text-white transition-colors"
+        className="absolute top-6 left-6 text-sm text-zinc-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-4 py-2 rounded-lg flex items-center gap-2 backdrop-blur-sm"
       >
         ← Exit
       </button>
 
-      <div className="w-full max-w-xl mb-8">
-        <h1 className="text-base font-medium text-white">{quiz.title}</h1>
-        {retryIds && (
-          <p className="text-xs text-zinc-500 mt-0.5">Retrying {activeQuestions.length} wrong answer(s)</p>
+      <div className="w-full max-w-4xl w-full flex flex-col items-center gap-8">
+        <div className="w-full text-center">
+          <p className="text-sm font-medium text-zinc-500 uppercase tracking-widest mb-2">{quiz.title}</p>
+          {retryIds && (
+            <span className="inline-block px-3 py-1 bg-red-500/10 text-red-400 text-xs rounded-full border border-red-500/20">
+              Retrying {activeQuestions.length} wrong answer(s)
+            </span>
+          )}
+        </div>
+        
+        <QuestionPlayer questions={activeQuestions} onComplete={handleComplete} />
+        
+        {isPending && (
+          <p className="mt-4 text-sm text-zinc-500 animate-pulse text-center">Saving result…</p>
         )}
       </div>
-      <QuestionPlayer questions={activeQuestions} onComplete={handleComplete} />
-      {isPending && (
-        <p className="mt-8 text-sm text-zinc-500 animate-pulse">Saving result…</p>
-      )}
     </div>
   );
 }
