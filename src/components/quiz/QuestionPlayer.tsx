@@ -63,7 +63,7 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
 
   const getOptionStyle = (opt: string) => {
     const base =
-      'w-full flex items-center justify-center text-center px-4 py-6 min-h-[100px] rounded-2xl border-2 text-base sm:text-lg font-medium transition-all duration-200 shadow-sm cursor-pointer';
+      'w-full flex items-center justify-center text-center px-4 py-3 sm:py-6 min-h-[60px] sm:min-h-[80px] rounded-2xl border-2 text-sm sm:text-lg font-medium transition-all duration-200 shadow-sm cursor-pointer';
 
     if (!checked) {
       return `${base} ${
@@ -84,7 +84,7 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
   };
 
   return (
-    <div className="w-full flex flex-col gap-10 sm:gap-14">
+    <div className="w-full flex flex-col gap-6 sm:gap-10">
       {/* Progress */}
       <div className="flex items-center gap-4 max-w-lg mx-auto w-full">
         <span className="text-sm font-semibold text-zinc-500 shrink-0 w-8 text-right">
@@ -102,7 +102,7 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
       </div>
 
       {/* Question and Options with Transition */}
-      <div key={index} className="animate-slide-fade w-full flex flex-col gap-10 sm:gap-14">
+      <div key={index} className="animate-slide-fade w-full flex flex-col gap-6 sm:gap-10">
         {/* Question */}
         <div className="text-center px-4 flex flex-col items-center">
           <div className="flex items-center gap-3 mb-4">
@@ -118,13 +118,13 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
               ))}
             </div>
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-relaxed md:leading-relaxed mx-auto max-w-3xl">
+          <h2 className="text-lg sm:text-3xl md:text-4xl font-bold text-white leading-snug sm:leading-relaxed mx-auto max-w-3xl">
             {question.text}
           </h2>
         </div>
 
         {/* Options */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 w-full max-w-4xl mx-auto">
           {shuffledOptions.map((opt) => (
             <button
               key={opt}
@@ -139,9 +139,9 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
       </div>
 
       {/* Feedback & Actions */}
-      <div className="w-full max-w-lg mx-auto flex flex-col gap-6 items-center">
+      <div className="w-full max-w-lg mx-auto flex flex-col gap-4 sm:gap-6 items-center">
         {checked && (
-          <div className={`text-center px-6 py-4 rounded-2xl w-full font-medium ${
+          <div className={`text-center px-4 py-3 sm:px-6 sm:py-4 rounded-xl sm:rounded-2xl w-full text-sm sm:text-base font-medium ${
             question.correct_answers.every((a) => selected.includes(a)) &&
             selected.length === question.correct_answers.length
               ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
