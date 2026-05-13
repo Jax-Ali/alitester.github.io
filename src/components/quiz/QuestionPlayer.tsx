@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import type { QuestionRow } from '@/types';
 import { ru } from '@/lib/i18n/ru';
 
@@ -18,6 +18,16 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
   const question = questions[index];
   const isMultiple = question.correct_answers.length > 1;
   const isLast = index === questions.length - 1;
+
+  // Shuffle options once per question
+  const shuffledOptions = useMemo(() => {
+    const array = [...question.options];
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }, [question.id]);
 
   const toggleOption = useCallback((opt: string) => {
     if (checked) return;
@@ -115,7 +125,7 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
 
         {/* Options */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full max-w-4xl mx-auto">
-          {question.options.map((opt) => (
+          {shuffledOptions.map((opt) => (
             <button
               key={opt}
               onClick={() => toggleOption(opt)}

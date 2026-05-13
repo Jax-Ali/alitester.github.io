@@ -34,13 +34,22 @@ export function QuizCard({ quiz, questionCount }: QuizCardProps) {
         )}
       </div>
 
-      <p className="text-xs text-zinc-600">
-        {new Date(quiz.created_at).toLocaleDateString('ru-RU', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric',
-        })}
-      </p>
+      <div className="flex items-center justify-between text-xs text-zinc-600">
+        <p>
+          {new Date(quiz.created_at).toLocaleDateString('ru-RU', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+          })}
+        </p>
+        <Link
+          href={`/edit/${quiz.id}`}
+          className="hover:text-white transition-colors"
+          title={ru.editButton}
+        >
+          ✏️
+        </Link>
+      </div>
 
       <div className="mt-auto flex gap-2">
         <Link

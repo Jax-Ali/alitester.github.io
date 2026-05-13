@@ -35,6 +35,17 @@ export const quizService = {
     return data;
   },
 
+  async update(id: string, payload: Partial<InsertQuiz>): Promise<QuizRow> {
+    const { data, error } = await supabase
+      .from('quizzes')
+      .update(payload)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
   async delete(id: string): Promise<void> {
     const { error } = await supabase.from('quizzes').delete().eq('id', id);
     if (error) throw new Error(error.message);
@@ -59,5 +70,13 @@ export const quizService = {
       .select();
     if (error) throw new Error(error.message);
     return data;
+  },
+
+  async deleteQuestions(quizId: string): Promise<void> {
+    const { error } = await supabase
+      .from('questions')
+      .delete()
+      .eq('quiz_id', quizId);
+    if (error) throw new Error(error.message);
   },
 };
