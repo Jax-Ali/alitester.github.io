@@ -87,6 +87,32 @@ export default function ResultPage({ params }: PageProps) {
         </p>
       </div>
 
+      {/* Wrong answers */}
+      {wrongQuestions.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <h2 className="text-sm font-medium text-zinc-400">{ru.wrongAnswers}</h2>
+          {wrongQuestions.map((q) => {
+            const userAnswer = attempt.answers?.[q.id] ?? [];
+            return (
+              <div
+                key={q.id}
+                className="bg-white/[0.03] border border-white/10 rounded-xl p-4 flex flex-col gap-2"
+              >
+                <p className="text-sm text-white">{q.text}</p>
+                <div className="text-xs space-y-1">
+                  <p className="text-red-400">
+                    {ru.yourAnswer} {userAnswer.length > 0 ? userAnswer.join(', ') : '—'}
+                  </p>
+                  <p className="text-emerald-400">
+                    {ru.correctAnswer} {q.correct_answers.join(', ')}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       {/* Actions */}
       <div className="flex flex-col gap-2">
         {wrongQuestions.length > 0 && (
