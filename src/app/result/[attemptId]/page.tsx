@@ -87,32 +87,6 @@ export default function ResultPage({ params }: PageProps) {
         </p>
       </div>
 
-      {/* Wrong answers */}
-      {wrongQuestions.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <h2 className="text-sm font-medium text-zinc-400">{ru.wrongAnswers}</h2>
-          {wrongQuestions.map((q) => {
-            const userAnswer = attempt.answers?.[q.id] ?? [];
-            return (
-              <div
-                key={q.id}
-                className="bg-white/[0.03] border border-white/10 rounded-xl p-4 flex flex-col gap-2"
-              >
-                <p className="text-sm text-white">{q.text}</p>
-                <div className="text-xs space-y-1">
-                  <p className="text-red-400">
-                    {ru.yourAnswer} {userAnswer.length > 0 ? userAnswer.join(', ') : '—'}
-                  </p>
-                  <p className="text-emerald-400">
-                    {ru.correctAnswer} {q.correct_answers.join(', ')}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
       {/* Actions */}
       <div className="flex flex-col gap-2">
         {wrongQuestions.length > 0 && (
@@ -133,6 +107,64 @@ export default function ResultPage({ params }: PageProps) {
         >
           ← {ru.backToDashboard}
         </Link>
+      </div>
+
+      {/* Full Test Review */}
+      <div className="flex flex-col gap-6 mt-4 border-t border-white/10 pt-8">
+        <h2 className="text-lg font-semibold text-white">{ru.allAnswers}</h2>
+        <div className="flex flex-col gap-8">
+          {questions.map((q, i) => {
+            const userAnswer = attempt.answers?.[q.id] ?? [];
+            const isFullyCorrect = 
+              userAnswer.length === q.correct_answers.length && 
+              q.correct_answers.every(a => userAnswer.includes(a));
+
+            return (
+              <div key={q.id} className="flex flex-col gap-4">
+                <div className="flex items-start gap-3">
+                  <span className={`shrink-0 mt-0.5 flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
+                    isFullyCorrect ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+                  }`}>
+                    {i + 1}
+                  </span>
+                  <h3 className="text-base text-white font-medium leading-snug">{q.text}</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-9">
+                  {q.options.map((opt) => {
+                    const isCorrect = q.correct_answers.includes(opt);
+                    const isSelected = userAnswer.includes(opt);
+                    
+                    let style = "border-white/5 bg-white/[0.02] text-zinc-500";
+                    let icon = null;
+                    
+                    if (isCorrect && isSelected) {
+                      style = "border-emerald-500 bg-emerald-500/10 text-emerald-400";
+                      icon = "✓";
+                    } else if (!isCorrect && isSelected) {
+                      style = "border-red-500 bg-red-500/10 text-red-400";
+                      icon = "✕";
+                    } else if (isCorrect && !isSelected) {
+                      style = "border-emerald-500/50 bg-transparent text-emerald-500";
+                      icon = "✓";
+                    }
+
+                    return (
+                      <div key={opt} className={`px-3 py-2.5 rounded-lg border text-sm flex items-start gap-2.5 ${style}`}>
+                        <div className={`shrink-0 mt-0.5 w-4 h-4 rounded flex items-center justify-center border ${
+                          isSelected ? 'border-current bg-current text-zinc-950' : 'border-current/50'
+                        }`}>
+                          {icon && <span className="text-[10px] font-bold leading-none">{icon}</span>}
+                        </div>
+                        <span className="leading-snug">{opt}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

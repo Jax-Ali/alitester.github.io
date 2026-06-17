@@ -25,6 +25,7 @@ export const ru = {
   keepPracticing: "Нужно потренироваться",
   correctCount: (correct: number, total: number) => `${correct} / ${total} правильно`,
   wrongAnswers: "Неверные ответы",
+  allAnswers: "Все ответы",
   yourAnswer: "Ваш ответ:",
   correctAnswer: "Правильно:",
   retryWrongBtn: (count: number) => `Повторить ошибки (${count})`,
