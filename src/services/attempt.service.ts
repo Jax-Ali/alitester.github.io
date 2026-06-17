@@ -44,23 +44,38 @@ export const attemptService = {
     answers: Record<string, string[]>,
     questions: { id: string; correct_answers: string[] }[]
   ): { score: number; wrongIds: string[] } {
-    let correct = 0;
+    let totalScore = 0;
     const wrongIds: string[] = [];
 
     for (const q of questions) {
       const selected = answers[q.id] ?? [];
-      const isCorrect =
-        selected.length === q.correct_answers.length &&
-        q.correct_answers.every((a) => selected.includes(a));
-      if (isCorrect) {
-        correct++;
-      } else {
+      const correctCount = q.correct_answers.length;
+      
+      let questionScore = 0;
+
+      if (correctCount > 0) {
+        const pointPerAnswer = 1 / correctCount;
+        selected.forEach((ans) => {
+          if (q.correct_answers.includes(ans)) {
+            questionScore += pointPerAnswer; // + for correct
+          } else {
+            questionScore -= pointPerAnswer; // - for wrong
+          }
+        });
+      }
+
+      // Clamp score between 0 and 1
+      questionScore = Math.max(0, Math.min(1, questionScore));
+      totalScore += questionScore;
+
+      // If they didn't get full points (accounting for float precision), mark as wrong for the retry loop
+      if (questionScore < 0.999) {
         wrongIds.push(q.id);
       }
     }
 
     const score = questions.length > 0
-      ? Math.round((correct / questions.length) * 100)
+      ? Math.round((totalScore / questions.length) * 100)
       : 0;
 
     return { score, wrongIds };

@@ -62,6 +62,9 @@ export default function ResultPage({ params }: PageProps) {
   const { attempt, quiz, questions, wrongQuestions } = data;
   const passed = attempt.score >= 70;
   const retryUrl = `/quiz/${quiz.id}?retry=${wrongQuestions.map((q) => q.id).join(',')}`;
+  
+  // attempt.score is a percentage (0-100). Convert back to raw fractional score.
+  const rawScore = Number(((attempt.score / 100) * questions.length).toFixed(2));
 
   return (
     <div className="min-h-screen max-w-xl mx-auto px-4 py-12 flex flex-col gap-8">
@@ -80,7 +83,7 @@ export default function ResultPage({ params }: PageProps) {
           {passed ? ru.wellDone : ru.keepPracticing}
         </h1>
         <p className="text-sm text-zinc-500 mt-1">
-          {quiz.title} · {ru.correctCount(questions.length - wrongQuestions.length, questions.length)}
+          {quiz.title} · {ru.correctCount(rawScore, questions.length)}
         </p>
       </div>
 
