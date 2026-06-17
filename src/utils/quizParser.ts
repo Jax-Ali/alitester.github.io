@@ -24,7 +24,7 @@ export interface ParseResult {
  *   - Multiple correct answers: C: Paris, London
  *   - Order of Q/A/C within a block doesn't matter
  */
-export function parseQuizText(raw: string): ParseResult {
+export function parseQACQuizText(raw: string): ParseResult {
   const errors: string[] = [];
   const questions: ParsedQuestion[] = [];
 
@@ -101,4 +101,111 @@ export function parseQuizText(raw: string): ParseResult {
   });
 
   return { questions, errors };
+}
+
+export function parseQuizText(raw: string): ParseResult {
+  // 1. Try QAC strict format first
+  const qacResult = parseQACQuizText(raw);
+  if (qacResult.errors.length === 0 && qacResult.questions.length > 0) {
+    return qacResult;
+  }
+
+  // 2. Smart Parser for University Formats (Platonus, numbered lists, etc.)
+  const questions: ParsedQuestion[] = [];
+  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+
+  let currentQuestion: {
+    text: string;
+    options: { text: string; isCorrect: boolean }[];
+    platonusCorrectCount?: number;
+  } | null = null;
+
+  const commitQuestion = () => {
+    if (currentQuestion && currentQuestion.options.length >= 2) {
+      // Resolve Platonus format: first N options are correct
+      if (currentQuestion.platonusCorrectCount !== undefined && currentQuestion.platonusCorrectCount > 0) {
+        for (let i = 0; i < currentQuestion.platonusCorrectCount && i < currentQuestion.options.length; i++) {
+          currentQuestion.options[i].isCorrect = true;
+        }
+      }
+
+      const correct_answers = currentQuestion.options
+        .filter(o => o.isCorrect)
+        .map(o => o.text);
+
+      questions.push({
+        text: currentQuestion.text,
+        options: currentQuestion.options.map(o => o.text),
+        correct_answers: correct_answers.length > 0 ? correct_answers : ['[УКАЖИТЕ ПРАВИЛЬНЫЙ ОТВЕТ]']
+      });
+    }
+    currentQuestion = null;
+  };
+
+  const isQuestionStart = (line: string) => {
+    return /^(Question\s*\d+|Вопрос\s*\d+|\d+[\.)]\s+)/i.test(line);
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    if (isQuestionStart(line)) {
+      commitQuestion();
+      
+      let text = line;
+      let platonusCorrectCount = 0;
+
+      const platonusMatch = line.match(/^(?:Question|Вопрос)\s*(\d+)/i);
+      if (platonusMatch) {
+        platonusCorrectCount = parseInt(platonusMatch[1], 10);
+        // If the line is purely "Question 2", the REAL question text is the next line
+        if (line.replace(/^(?:Question|Вопрос)\s*\d+/i, '').trim() === '') {
+          i++;
+          if (i < lines.length) {
+            text = lines[i];
+          }
+        } else {
+          text = line.replace(/^(?:Question|Вопрос)\s*\d+[:\.\-]?\s*/i, '');
+        }
+      } else {
+        // Standard numbered list "1. What is..."
+        text = line.replace(/^\d+[\.)]\s*/, '');
+      }
+
+      currentQuestion = {
+        text,
+        options: [],
+        platonusCorrectCount
+      };
+    } else {
+      if (!currentQuestion) {
+        // Ignore floating text before the first question starts
+        continue;
+      } else {
+        // It's an option
+        let isCorrect = false;
+        let optText = line;
+
+        // Check for markers: +, *, [x], (x), v), V)
+        const markerMatch = optText.match(/^([+*]|\[x\]|\(x\)|v\)|V\))\s*/i);
+        if (markerMatch) {
+          isCorrect = true;
+          optText = optText.substring(markerMatch[0].length).trim();
+        }
+
+        // Clean up leading letters like A), B), a., b.
+        optText = optText.replace(/^[a-eA-Eа-яА-Я][\.)]\s*/, '');
+
+        currentQuestion.options.push({ text: optText, isCorrect });
+      }
+    }
+  }
+  commitQuestion();
+
+  if (questions.length === 0) {
+    // If smart parser also failed entirely, fallback to QAC errors so the user sees something
+    return qacResult;
+  }
+
+  return { questions, errors: [] };
 }
