@@ -143,7 +143,7 @@ export function parseQuizText(raw: string): ParseResult {
   };
 
   const isQuestionStart = (line: string) => {
-    return /^(Question\s*\d+|Вопрос\s*\d+|\d+[\.)]\s+)/i.test(line);
+    return /^(Question\s*\d+|Вопрос\s*\d+|\d+[\.)]\s+|<question>)/i.test(line);
   };
 
   for (let i = 0; i < lines.length; i++) {
@@ -167,6 +167,8 @@ export function parseQuizText(raw: string): ParseResult {
         } else {
           text = line.replace(/^(?:Question|Вопрос)\s*\d+[:\.\-]?\s*/i, '');
         }
+      } else if (/^<question>/i.test(line)) {
+        text = line.replace(/^<question>\s*/i, '');
       } else {
         // Standard numbered list "1. What is..."
         text = line.replace(/^\d+[\.)]\s*/, '');
@@ -185,6 +187,11 @@ export function parseQuizText(raw: string): ParseResult {
         // It's an option
         let isCorrect = false;
         let optText = line;
+
+        // Check for <variant> tag
+        if (/^<variant>/i.test(optText)) {
+          optText = optText.replace(/^<variant>\s*/i, '');
+        }
 
         // Check for markers: +, *, [x], (x), v), V)
         const markerMatch = optText.match(/^([+*]|\[x\]|\(x\)|v\)|V\))\s*/i);

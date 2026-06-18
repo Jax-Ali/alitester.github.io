@@ -38,38 +38,19 @@ export default function CreatePage() {
     setErrors([]);
     setAiProgress(0);
     try {
-      const chunks = text.split(/\n\s*\n/).reduce((acc, block) => {
-        if (acc.length === 0) acc.push(block);
-        else {
-          const last = acc[acc.length - 1];
-          if (last.length + block.length < 2000) {
-            acc[acc.length - 1] = last + '\n\n' + block;
-          } else {
-            acc.push(block);
-          }
-        }
-        return acc;
-      }, [] as string[]);
-
-      let allQuestions: any[] = [];
-      for (let i = 0; i < chunks.length; i++) {
-        setAiProgress(Math.round((i / chunks.length) * 100));
-        const res = await fetch('/api/parse', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: chunks[i] })
-        });
-        
-        if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.error || 'Ошибка API ИИ');
-        }
-        
-        const data = await res.json();
-        if (data.questions) {
-          allQuestions.push(...data.questions);
-        }
+      const res = await fetch('/api/parse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Ошибка API ИИ');
       }
+      
+      const data = await res.json();
+      const allQuestions = data.questions || [];
       setAiProgress(100);
 
       setParsedQuestions(allQuestions);
