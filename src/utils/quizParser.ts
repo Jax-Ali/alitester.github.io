@@ -143,7 +143,7 @@ export function parseQuizText(raw: string): ParseResult {
   };
 
   const isQuestionStart = (line: string) => {
-    return /^(Question\s*\d+|Вопрос\s*\d+|\d+[\.)]\s+|<question>)/i.test(line);
+    return /^(Question\s*\d+|Вопрос\s*\d+|\d+[\.)]\s+|<question\d*>)/i.test(line);
   };
 
   for (let i = 0; i < lines.length; i++) {
@@ -156,6 +156,8 @@ export function parseQuizText(raw: string): ParseResult {
       let platonusCorrectCount = 0;
 
       const platonusMatch = line.match(/^(?:Question|Вопрос)\s*(\d+)/i);
+      const qTagMatch = line.match(/^<question(\d*)>/i);
+
       if (platonusMatch) {
         platonusCorrectCount = parseInt(platonusMatch[1], 10);
         // If the line is purely "Question 2", the REAL question text is the next line
@@ -167,8 +169,9 @@ export function parseQuizText(raw: string): ParseResult {
         } else {
           text = line.replace(/^(?:Question|Вопрос)\s*\d+[:\.\-]?\s*/i, '');
         }
-      } else if (/^<question>/i.test(line)) {
-        text = line.replace(/^<question>\s*/i, '');
+      } else if (qTagMatch) {
+        platonusCorrectCount = qTagMatch[1] ? parseInt(qTagMatch[1], 10) : 1;
+        text = line.replace(/^<question\d*>\s*/i, '');
       } else {
         // Standard numbered list "1. What is..."
         text = line.replace(/^\d+[\.)]\s*/, '');
@@ -188,8 +191,11 @@ export function parseQuizText(raw: string): ParseResult {
         let isCorrect = false;
         let optText = line;
 
-        // Check for <variant> tag
-        if (/^<variant>/i.test(optText)) {
+        // Check for <variantright> and <variant> tags
+        if (/^<variantright>/i.test(optText)) {
+          isCorrect = true;
+          optText = optText.replace(/^<variantright>\s*/i, '');
+        } else if (/^<variant>/i.test(optText)) {
           optText = optText.replace(/^<variant>\s*/i, '');
         }
 

@@ -2,16 +2,20 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import type { QuizRow } from '@/types';
+import type { QuizRow, FolderRow } from '@/types';
 import { ru } from '@/lib/i18n/ru';
+import { quizService } from '@/services/quiz.service';
 
 interface QuizCardProps {
   quiz: QuizRow;
   questionCount?: number;
+  folders?: FolderRow[];
 }
 
-export function QuizCard({ quiz, questionCount }: QuizCardProps) {
+export function QuizCard({ quiz, questionCount, folders = [] }: QuizCardProps) {
   const [copied, setCopied] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [currentFolderId, setCurrentFolderId] = useState(quiz.folder_id);
 
   const handleCopyLink = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -19,6 +23,21 @@ export function QuizCard({ quiz, questionCount }: QuizCardProps) {
     navigator.clipboard.writeText(link);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleFolderChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    e.preventDefault();
+    const newFolderId = e.target.value || null;
+    setIsUpdating(true);
+    try {
+      await quizService.update(quiz.id, { folder_id: newFolderId });
+      setCurrentFolderId(newFolderId);
+    } catch (err) {
+      console.error('Failed to update folder', err);
+      alert('Ошибка при перемещении теста');
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (
@@ -34,21 +53,46 @@ export function QuizCard({ quiz, questionCount }: QuizCardProps) {
         )}
       </div>
 
-      <div className="flex items-center justify-between text-xs text-zinc-600">
-        <p>
-          {new Date(quiz.created_at).toLocaleDateString('ru-RU', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-          })}
-        </p>
-        <Link
-          href={`/edit/${quiz.id}`}
-          className="hover:text-white transition-colors"
-          title={ru.editButton}
-        >
-          ✏️
-        </Link>
+      <div className="flex items-center justify-between text-xs text-zinc-600 gap-2">
+        <div className="flex items-center gap-2 flex-1">
+          <p className="shrink-0">
+            {new Date(quiz.created_at).toLocaleDateString('ru-RU', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            })}
+          </p>
+          {folders.length > 0 && (
+            <select
+              value={currentFolderId || ''}
+              onChange={handleFolderChange}
+              disabled={isUpdating}
+              className="bg-black/50 border border-white/10 rounded px-2 py-0.5 text-xs text-zinc-400 focus:outline-none w-24 sm:w-auto"
+            >
+              <option value="">Без папки</option>
+              {folders.map(f => (
+                <option key={f.id} value={f.id}>{f.name}</option>
+              ))}
+            </select>
+          )}
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <Link
+            href={`/print/${quiz.id}`}
+            target="_blank"
+            className="hover:text-white transition-colors"
+            title="Распечатать"
+          >
+            🖨️
+          </Link>
+          <Link
+            href={`/edit/${quiz.id}`}
+            className="hover:text-white transition-colors"
+            title={ru.editButton}
+          >
+            ✏️
+          </Link>
+        </div>
       </div>
 
       <div className="mt-auto flex gap-2">

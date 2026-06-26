@@ -13,6 +13,7 @@ export default function AdminPage() {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [userQuizzes, setUserQuizzes] = useState<QuizRow[]>([]);
+  const [userFolders, setUserFolders] = useState<Record<string, string>>({});
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -47,16 +48,30 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (selectedUserId) {
-      supabase
-        .from('quizzes')
-        .select('*')
-        .eq('created_by', selectedUserId)
-        .order('created_at', { ascending: false })
-        .then(({ data }) => {
-          setUserQuizzes(data || []);
-        });
+      Promise.all([
+        supabase
+          .from('quizzes')
+          .select('*')
+          .eq('created_by', selectedUserId)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('folders')
+          .select('*')
+          .eq('created_by', selectedUserId)
+      ]).then(([quizzesRes, foldersRes]) => {
+        setUserQuizzes(quizzesRes.data || []);
+        
+        const folderMap: Record<string, string> = {};
+        if (foldersRes.data) {
+          foldersRes.data.forEach(f => {
+            folderMap[f.id] = f.name;
+          });
+        }
+        setUserFolders(folderMap);
+      });
     } else {
       setUserQuizzes([]);
+      setUserFolders({});
     }
   }, [selectedUserId]);
 
@@ -132,7 +147,14 @@ export default function AdminPage() {
                       className="bg-white/5 border border-white/10 p-4 rounded-xl flex justify-between items-center transition-colors hover:border-white/20"
                     >
                       <div>
-                        <p className="text-sm text-white font-medium">{quiz.title}</p>
+                        <p className="text-sm text-white font-medium flex items-center gap-2">
+                          {quiz.title}
+                          {quiz.folder_id && userFolders[quiz.folder_id] && (
+                            <span className="bg-white/10 text-zinc-300 px-2 py-0.5 rounded text-xs">
+                              📁 {userFolders[quiz.folder_id]}
+                            </span>
+                          )}
+                        </p>
                         <p className="text-xs text-zinc-500 mt-1">
                           {new Date(quiz.created_at).toLocaleDateString()}
                         </p>

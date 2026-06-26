@@ -1,10 +1,19 @@
 // ─── Domain types matching Supabase table columns exactly ────────────────────
 
+export interface FolderRow {
+  id: string;
+  name: string;
+  created_by: string;
+  created_at: string;
+}
+
 export interface QuizRow {
   id: string;
   title: string;
   created_by: string;
   created_at: string;
+  folder_id: string | null;
+  tags: string[];
 }
 
 export type QuestionType = 'single' | 'multiple';
@@ -37,7 +46,9 @@ export interface UserRow {
 
 // ─── Insert types ─────────────────────────────────────────────────────────────
 
-export type InsertQuiz = Pick<QuizRow, 'title' | 'created_by'>;
+export type InsertQuiz = Pick<QuizRow, 'title' | 'created_by'> & Partial<Pick<QuizRow, 'folder_id' | 'tags'>>;
+
+export type InsertFolder = Pick<FolderRow, 'name' | 'created_by'>;
 
 export type InsertQuestion = Omit<QuestionRow, 'id'>;
 
@@ -54,10 +65,16 @@ export interface Database {
         Update: Partial<UserRow>;
         Relationships: any[];
       };
+      folders: {
+        Row: FolderRow;
+        Insert: InsertFolder;
+        Update: Partial<Pick<FolderRow, 'name'>>;
+        Relationships: any[];
+      };
       quizzes: {
         Row: QuizRow;
         Insert: InsertQuiz;
-        Update: Partial<Pick<QuizRow, 'title'>>;
+        Update: Partial<Pick<QuizRow, 'title' | 'folder_id' | 'tags'>>;
         Relationships: any[];
       };
       questions: {

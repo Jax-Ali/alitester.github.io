@@ -73,7 +73,7 @@ export function QuizClient({ quiz, questions, retryIds }: QuizClientProps) {
           )}
         </div>
         
-        <QuestionPlayer questions={activeQuestions} onComplete={handleComplete} />
+        <QuestionPlayer quizId={quiz.id} questions={activeQuestions} onComplete={handleComplete} />
         
         {isPending && (
           <p className="mt-4 text-sm text-zinc-500 animate-pulse text-center">{ru.savingResult}</p>

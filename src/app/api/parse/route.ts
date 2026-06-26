@@ -52,9 +52,11 @@ ${text}
 
     const data = await response.json();
     let resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
+    console.log('Raw resultText:', resultText);
     
     // Clean up markdown just in case the AI ignored instructions
-    resultText = resultText.replace(/^```json/i, '').replace(/```$/i, '').trim();
+    resultText = resultText.replace(/^```json\n?/i, '').replace(/```$/i, '').trim();
+    console.log('Cleaned resultText:', resultText);
 
     const parsedData = JSON.parse(resultText);
 

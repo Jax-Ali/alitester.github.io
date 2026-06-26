@@ -5,29 +5,49 @@ import type { QuestionRow } from '@/types';
 import { ru } from '@/lib/i18n/ru';
 
 interface QuestionPlayerProps {
+  quizId: string;
   questions: QuestionRow[];
   onComplete: (answers: Record<string, string[]>) => void;
 }
 
-export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
+export function QuestionPlayer({ quizId, questions, onComplete }: QuestionPlayerProps) {
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<string[]>([]);
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
   const [checked, setChecked] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Load from local storage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(`quiz_attempt_${quizId}`);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed.index === 'number' && parsed.answers) {
+          setIndex(parsed.index);
+          setAnswers(parsed.answers);
+        }
+      } catch (e) {
+        console.error('Failed to parse cached quiz attempt', e);
+      }
+    }
+    setIsInitialized(true);
+  }, [quizId]);
 
   const question = questions[index];
-  const isMultiple = question.correct_answers.length > 1;
+  const isMultiple = question ? question.correct_answers.length > 1 : false;
   const isLast = index === questions.length - 1;
 
   // Shuffle options once per question
   const shuffledOptions = useMemo(() => {
+    if (!question) return [];
     const array = [...question.options];
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
-  }, [question.id]);
+  }, [question?.id]);
 
   const toggleOption = useCallback((opt: string) => {
     if (checked) return;
@@ -41,16 +61,27 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
   const handleCheck = () => setChecked(true);
 
   const handleNext = useCallback(() => {
+    if (!question) return;
     const nextAnswers = { ...answers, [question.id]: selected };
+    
     if (isLast) {
+      // Clean up cache on complete
+      localStorage.removeItem(`quiz_attempt_${quizId}`);
       onComplete(nextAnswers);
     } else {
       setAnswers(nextAnswers);
       setSelected([]);
       setChecked(false);
-      setIndex((i) => i + 1);
+      const nextIndex = index + 1;
+      setIndex(nextIndex);
+      
+      // Save state
+      localStorage.setItem(`quiz_attempt_${quizId}`, JSON.stringify({
+        index: nextIndex,
+        answers: nextAnswers
+      }));
     }
-  }, [answers, question.id, selected, isLast, onComplete]);
+  }, [answers, question, selected, isLast, onComplete, index, quizId]);
 
   useEffect(() => {
     if (checked) {
@@ -82,6 +113,8 @@ export function QuestionPlayer({ questions, onComplete }: QuestionPlayerProps) {
       return `${base} border-red-500 bg-red-500/20 text-red-100 shadow-red-500/10 shadow-lg scale-[1.02]`;
     return `${base} border-white/5 bg-white/[0.02] text-zinc-600 opacity-50 cursor-default`;
   };
+
+  if (!isInitialized || !question) return null;
 
   return (
     <div className="w-full flex flex-col gap-6 sm:gap-10">
