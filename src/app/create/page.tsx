@@ -87,19 +87,25 @@ export default function CreatePage() {
   };
 
   const toggleCorrectAnswer = (qIndex: number, option: string) => {
-    const newQs = [...parsedQuestions];
-    const q = newQs[qIndex];
-    
-    if (q.correct_answers.includes(option)) {
-      q.correct_answers = q.correct_answers.filter(a => a !== option);
-      if (q.correct_answers.length === 0) {
-        q.correct_answers = ['[УКАЖИТЕ ПРАВИЛЬНЫЙ ОТВЕТ]'];
-      }
-    } else {
-      q.correct_answers = q.correct_answers.filter(a => a !== '[УКАЖИТЕ ПРАВИЛЬНЫЙ ОТВЕТ]');
-      q.correct_answers.push(option);
-    }
-    setParsedQuestions(newQs);
+    setParsedQuestions((prev) =>
+      prev.map((q, idx) => {
+        if (idx !== qIndex) return q;
+        let newCorrect: string[];
+        if (q.correct_answers.includes(option)) {
+          newCorrect = q.correct_answers.filter((a) => a !== option);
+          if (newCorrect.length === 0) {
+            newCorrect = ['[УКАЖИТЕ ПРАВИЛЬНЫЙ ОТВЕТ]'];
+          }
+        } else {
+          newCorrect = q.correct_answers.filter((a) => a !== '[УКАЖИТЕ ПРАВИЛЬНЫЙ ОТВЕТ]');
+          newCorrect.push(option);
+        }
+        return {
+          ...q,
+          correct_answers: newCorrect,
+        };
+      })
+    );
   };
 
   const handleFinalCreate = () => {
@@ -154,8 +160,13 @@ export default function CreatePage() {
                    {q.options.map((opt, j) => {
                      const isCorrect = q.correct_answers.includes(opt);
                      return (
-                       <label key={j} className={`flex items-center gap-4 p-4 rounded-xl cursor-pointer border transition-all duration-200 ${isCorrect ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-100' : 'bg-black/20 border-white/5 text-zinc-300 hover:bg-white/5'}`}>
-                         <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${isCorrect ? 'bg-indigo-500 text-white' : 'border border-white/20 bg-black/50'}`}>
+                       <button
+                         type="button"
+                         key={j}
+                         onClick={() => toggleCorrectAnswer(i, opt)}
+                         className={`w-full text-left flex items-center gap-4 p-4 rounded-xl cursor-pointer border transition-all duration-200 select-none ${isCorrect ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-100' : 'bg-black/20 border-white/5 text-zinc-300 hover:bg-white/5'}`}
+                       >
+                         <div className={`w-5 h-5 shrink-0 rounded flex items-center justify-center transition-colors ${isCorrect ? 'bg-indigo-500 text-white' : 'border border-white/20 bg-black/50'}`}>
                            {isCorrect && (
                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -163,7 +174,7 @@ export default function CreatePage() {
                            )}
                          </div>
                          <span className="text-sm font-medium">{opt}</span>
-                       </label>
+                       </button>
                      )
                    })}
                  </div>
