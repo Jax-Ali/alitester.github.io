@@ -10,11 +10,13 @@ interface QuizCardProps {
   quiz: QuizRow;
   questionCount?: number;
   folders?: FolderRow[];
+  onDelete?: (id: string) => void;
 }
 
-export function QuizCard({ quiz, questionCount, folders = [] }: QuizCardProps) {
+export function QuizCard({ quiz, questionCount, folders = [], onDelete }: QuizCardProps) {
   const [copied, setCopied] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [currentFolderId, setCurrentFolderId] = useState(quiz.folder_id);
 
   const handleCopyLink = (e: React.MouseEvent) => {
@@ -37,6 +39,22 @@ export function QuizCard({ quiz, questionCount, folders = [] }: QuizCardProps) {
       alert('Ошибка при перемещении теста');
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!window.confirm(`Вы уверены, что хотите удалить тест "${quiz.title}"? Это действие необратимо.`)) {
+      return;
+    }
+    setIsDeleting(true);
+    try {
+      await quizService.delete(quiz.id);
+      onDelete?.(quiz.id);
+    } catch (err) {
+      console.error('Failed to delete quiz', err);
+      alert('Ошибка при удалении теста');
+      setIsDeleting(false);
     }
   };
 
@@ -92,6 +110,14 @@ export function QuizCard({ quiz, questionCount, folders = [] }: QuizCardProps) {
           >
             ✏️
           </Link>
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="hover:text-red-400 transition-colors disabled:opacity-50"
+            title="Удалить тест"
+          >
+            🗑️
+          </button>
         </div>
       </div>
 

@@ -9,27 +9,6 @@ import { Button } from '@/components/ui/Button';
 import { ru } from '@/lib/i18n/ru';
 import type { QuizRow, QuestionRow } from '@/types';
 
-const CHATGPT_PROMPT = `Преобразуй следующий текст теста в строгий формат:
-
-Требования:
-- Каждый вопрос начинается с "Q:"
-- Варианты ответов начинаются с "A:"
-- Варианты разделяются символом "|"
-- В некоторых вопросах должно быть несколько правильных ответов (2–3)
-- Правильные ответы указываются через "C:"
-- Если несколько правильных ответов — перечисли их строго через символ "|" (а не через запятую)
-- Между вопросами должен быть пустой строкой
-- Это все обьязательные требования!!!
-Пример:
-
-Q: Вопрос
-A: вариант1 | вариант2 | вариант3 | вариант4 | вариант5
-C: вариант1 | вариант3
-
-Теперь преобразуй следующий текст:
-
-"`;
-
 interface EditClientProps {
   quiz: QuizRow;
   questions: QuestionRow[];
@@ -198,6 +177,23 @@ function EditClient({ quiz, questions: initialQuestions }: EditClientProps) {
     });
   };
 
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!window.confirm(`Вы уверены, что хотите удалить тест "${title}"? Все вопросы и результаты будут безвозвратно удалены.`)) {
+      return;
+    }
+    setIsDeleting(true);
+    try {
+      await quizService.delete(quiz.id);
+      router.push('/dashboard');
+    } catch (err) {
+      console.error('Failed to delete quiz', err);
+      alert('Ошибка при удалении теста');
+      setIsDeleting(false);
+    }
+  };
+
   const hasAnyMissing = questions.some(q => q.correct_answers.includes('[УКАЖИТЕ ПРАВИЛЬНЫЙ ОТВЕТ]'));
 
   return (
@@ -326,6 +322,15 @@ function EditClient({ quiz, questions: initialQuestions }: EditClientProps) {
         </div>
 
         <div className="flex gap-4 sticky bottom-6 p-5 mt-8 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl z-40">
+          <Button
+            type="button"
+            onClick={handleDelete}
+            loading={isDeleting}
+            variant="danger"
+            className="px-4"
+          >
+            🗑️ Удалить тест
+          </Button>
           <Button onClick={() => router.back()} variant="ghost" className="px-6">
             Отмена
           </Button>

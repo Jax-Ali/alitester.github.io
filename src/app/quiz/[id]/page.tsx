@@ -97,7 +97,6 @@ export default function QuizPageWrapper(props: PageProps) {
 function QuizPageLoader({ params, searchParams }: PageProps) {
   const [data, setData] = useState<{ quiz: QuizRow; questions: QuestionRow[]; retryIds?: string[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
     (async () => {

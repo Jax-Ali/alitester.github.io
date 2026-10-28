@@ -47,6 +47,8 @@ export const quizService = {
   },
 
   async delete(id: string): Promise<void> {
+    await supabase.from('attempts').delete().eq('quiz_id', id);
+    await supabase.from('questions').delete().eq('quiz_id', id);
     const { error } = await supabase.from('quizzes').delete().eq('id', id);
     if (error) throw new Error(error.message);
   },

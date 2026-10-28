@@ -55,6 +55,10 @@ export default function DashboardPage() {
     }
   };
 
+  const handleDeleteQuiz = (quizId: string) => {
+    setQuizzes((prev) => prev.filter((q) => q.id !== quizId));
+  };
+
   const filteredQuizzes = quizzes.filter(q => 
     selectedFolderId === null ? true : q.folder_id === selectedFolderId
   );
@@ -160,7 +164,7 @@ export default function DashboardPage() {
           ) : (
             <div className="grid gap-3 sm:grid-cols-2">
               {filteredQuizzes.map((quiz) => (
-                <QuizCard key={quiz.id} quiz={quiz} folders={folders} />
+                <QuizCard key={quiz.id} quiz={quiz} folders={folders} onDelete={handleDeleteQuiz} />
               ))}
             </div>
           )}
