@@ -96,6 +96,13 @@ export function QuizCard({ quiz, questionCount, folders = [], onDelete }: QuizCa
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Link
+            href={`/report/${quiz.id}`}
+            className="hover:text-white transition-colors text-xs"
+            title="Отчёт и аналитика"
+          >
+            📊
+          </Link>
+          <Link
             href={`/print/${quiz.id}`}
             target="_blank"
             className="hover:text-white transition-colors"

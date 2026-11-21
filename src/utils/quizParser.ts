@@ -1,7 +1,11 @@
+import type { QuestionMetadata } from '@/types';
+
 export interface ParsedQuestion {
   text: string;
   options: string[];
   correct_answers: string[];
+  explanation?: string | null;
+  metadata?: QuestionMetadata;
 }
 
 export interface ParseResult {

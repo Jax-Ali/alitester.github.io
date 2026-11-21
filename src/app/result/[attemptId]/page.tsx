@@ -8,6 +8,7 @@ import { quizService } from '@/services/quiz.service';
 import type { AttemptRow, QuestionRow, QuizRow } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { ru } from '@/lib/i18n/ru';
+import { AIExplanationCard, type ExplanationData } from '@/components/quiz/AIExplanationCard';
 
 interface PageProps {
   params: Promise<{ attemptId: string }>;
@@ -22,6 +23,11 @@ export default function ResultPage({ params }: PageProps) {
     wrongQuestions: QuestionRow[];
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [explanations, setExplanations] = useState<Record<string, ExplanationData>>({});
+
+  const handleExplanationLoaded = (questionId: string, explanation: ExplanationData) => {
+    setExplanations((prev) => ({ ...prev, [questionId]: explanation }));
+  };
 
   useEffect(() => {
     (async () => {
@@ -107,6 +113,12 @@ export default function ResultPage({ params }: PageProps) {
                     {ru.correctAnswer} {q.correct_answers.join(', ')}
                   </p>
                 </div>
+                <AIExplanationCard
+                  attemptId={attempt.id}
+                  questionId={q.id}
+                  cachedExplanation={explanations[q.id]}
+                  onExplanationLoaded={handleExplanationLoaded}
+                />
               </div>
             );
           })}
@@ -187,6 +199,16 @@ export default function ResultPage({ params }: PageProps) {
                     );
                   })}
                 </div>
+                {!isFullyCorrect && (
+                  <div className="pl-9">
+                    <AIExplanationCard
+                      attemptId={attempt.id}
+                      questionId={q.id}
+                      cachedExplanation={explanations[q.id]}
+                      onExplanationLoaded={handleExplanationLoaded}
+                    />
+                  </div>
+                )}
               </div>
             );
           })}

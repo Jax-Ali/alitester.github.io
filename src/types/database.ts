@@ -18,6 +18,15 @@ export interface QuizRow {
 
 export type QuestionType = 'single' | 'multiple';
 
+export interface QuestionMetadata {
+  subject?: string;
+  topic?: string;
+  subtopic?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  source?: string;
+  tags?: string[];
+}
+
 export interface QuestionRow {
   id: string;
   quiz_id: string;
@@ -25,6 +34,8 @@ export interface QuestionRow {
   options: string[];         // e.g. ["Paris", "London", "Berlin"]
   correct_answers: string[]; // subset of options
   order: number;
+  explanation: string | null;
+  metadata: QuestionMetadata;
 }
 
 export interface AttemptRow {
@@ -50,7 +61,10 @@ export type InsertQuiz = Pick<QuizRow, 'title' | 'created_by'> & Partial<Pick<Qu
 
 export type InsertFolder = Pick<FolderRow, 'name' | 'created_by'>;
 
-export type InsertQuestion = Omit<QuestionRow, 'id'>;
+export type InsertQuestion = Omit<QuestionRow, 'id' | 'explanation' | 'metadata'> & {
+  explanation?: string | null;
+  metadata?: QuestionMetadata;
+};
 
 export type InsertAttempt = Omit<AttemptRow, 'id' | 'completed_at'>;
 

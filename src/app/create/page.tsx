@@ -7,6 +7,7 @@ import { quizService } from '@/services/quiz.service';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/Button';
 import { ru } from '@/lib/i18n/ru';
+import { AIGenerateModal } from '@/components/quiz/AIGenerateModal';
 
 const EXAMPLE = `Вставьте сюда свой текст...
 Например, формат QAC:
@@ -29,9 +30,19 @@ export default function CreatePage() {
   const [parsedQuestions, setParsedQuestions] = useState<ParsedQuestion[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
+  const [showAIGenerate, setShowAIGenerate] = useState(false);
   
   const [isAIParsing, setIsAIParsing] = useState(false);
   const [aiProgress, setAiProgress] = useState(0);
+
+  const handleAIQuestionsGenerated = (newQuestions: ParsedQuestion[], generatedTopic?: string) => {
+    if (generatedTopic && !title.trim()) {
+      setTitle(generatedTopic);
+    }
+    setParsedQuestions(newQuestions);
+    setErrors([]);
+    setStep('preview');
+  };
 
   const handleAIParse = async () => {
     setIsAIParsing(true);
@@ -131,6 +142,8 @@ export default function CreatePage() {
           options: q.options,
           correct_answers: q.correct_answers,
           order: i,
+          explanation: q.explanation ?? null,
+          metadata: q.metadata ?? {},
         }))
       );
 
@@ -212,11 +225,30 @@ export default function CreatePage() {
         </p>
       </div>
 
-      <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-6 flex flex-col gap-3">
-        <h2 className="text-sm font-semibold text-indigo-400">✨ Умный парсер тестов</h2>
-        <p className="text-xs text-zinc-400 leading-relaxed">
-          Просто скопируйте и вставьте ваш текст. Наш умный алгоритм сам распознает формат Platonus (где правильные ответы идут первыми), либо классические форматы с плюсиками и звездочками (+ Ответ, * Ответ). 
-          Если формат слишком сложный, мы подключим ИИ!
+      {/* AI Generate Banner */}
+      <div className="bg-gradient-to-r from-indigo-500/15 via-purple-500/10 to-indigo-500/10 border border-indigo-500/30 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg">
+        <div>
+          <h2 className="text-sm font-semibold text-indigo-300 flex items-center gap-2">
+            <span>✨</span>
+            <span>Генерация вопросов с ИИ</span>
+          </h2>
+          <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
+            Нет готового файла? Введите тему или конспект, и Gemini составит тест автоматически.
+          </p>
+        </div>
+        <Button
+          type="button"
+          onClick={() => setShowAIGenerate(true)}
+          className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 shrink-0 shadow-md font-medium"
+        >
+          ✨ Сгенерировать с ИИ
+        </Button>
+      </div>
+
+      <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-5 flex flex-col gap-2">
+        <h2 className="text-sm font-medium text-zinc-300">📋 Импорт готового текста</h2>
+        <p className="text-xs text-zinc-500 leading-relaxed">
+          Или вставьте ваш текст ниже. Наш алгоритм сам распознает формат Platonus, списки или форматы с плюсиками (+ Ответ).
         </p>
       </div>
 
@@ -275,6 +307,13 @@ export default function CreatePage() {
           </Button>
         </div>
       </div>
+
+      <AIGenerateModal
+        isOpen={showAIGenerate}
+        onClose={() => setShowAIGenerate(false)}
+        onQuestionsGenerated={handleAIQuestionsGenerated}
+        initialTopic={title}
+      />
     </div>
   );
 }

@@ -69,7 +69,9 @@ ${text}
       ...q,
       correct_answers: Array.isArray(q.correct_answers) && q.correct_answers.length > 0 
         ? q.correct_answers 
-        : ['[УКАЖИТЕ ПРАВИЛЬНЫЙ ОТВЕТ]']
+        : ['[УКАЖИТЕ ПРАВИЛЬНЫЙ ОТВЕТ]'],
+      explanation: q.explanation ?? null,
+      metadata: q.metadata ?? {},
     }));
 
     return NextResponse.json({ questions: standardized });

@@ -36,6 +36,16 @@ export const attemptService = {
     return data;
   },
 
+  async getByQuiz(quizId: string): Promise<AttemptRow[]> {
+    const { data, error } = await supabase
+      .from('attempts')
+      .select('*')
+      .eq('quiz_id', quizId)
+      .order('completed_at', { ascending: false });
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  },
+
   /**
    * Calculates score as a percentage of correct answers.
    * A question is "correct" if selected answers exactly match correct_answers.

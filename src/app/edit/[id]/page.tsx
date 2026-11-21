@@ -8,11 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/Button';
 import { ru } from '@/lib/i18n/ru';
 import type { QuizRow, QuestionRow } from '@/types';
-
-interface EditClientProps {
-  quiz: QuizRow;
-  questions: QuestionRow[];
-}
+import { AIGenerateModal } from '@/components/quiz/AIGenerateModal';
 
 interface EditClientProps {
   quiz: QuizRow;
@@ -27,15 +23,22 @@ function EditClient({ quiz, questions: initialQuestions }: EditClientProps) {
     initialQuestions.map(q => ({
       text: q.text,
       options: [...q.options],
-      correct_answers: [...q.correct_answers]
+      correct_answers: [...q.correct_answers],
+      explanation: q.explanation ?? null,
+      metadata: q.metadata ?? {},
     }))
   );
 
   const [isPending, startTransition] = useTransition();
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [showTextImport, setShowTextImport] = useState(false);
+  const [showAIGenerateModal, setShowAIGenerateModal] = useState(false);
   const [importText, setImportText] = useState('');
   const [isAIParsing, setIsAIParsing] = useState(false);
+
+  const handleAIQuestionsGenerated = (newQuestions: ParsedQuestion[]) => {
+    setQuestions((prev) => [...prev, ...newQuestions]);
+  };
 
   const toggleCorrectAnswer = (qIndex: number, option: string) => {
     const newQs = [...questions];
@@ -101,7 +104,9 @@ function EditClient({ quiz, questions: initialQuestions }: EditClientProps) {
     setQuestions([...questions, {
       text: 'Новый вопрос',
       options: ['Вариант 1', 'Вариант 2', 'Вариант 3', 'Вариант 4'],
-      correct_answers: ['[УКАЖИТЕ ПРАВИЛЬНЫЙ ОТВЕТ]']
+      correct_answers: ['[УКАЖИТЕ ПРАВИЛЬНЫЙ ОТВЕТ]'],
+      explanation: null,
+      metadata: {},
     }]);
     setShowAddMenu(false);
   };
@@ -170,6 +175,8 @@ function EditClient({ quiz, questions: initialQuestions }: EditClientProps) {
           options: q.options,
           correct_answers: q.correct_answers,
           order: i,
+          explanation: q.explanation ?? null,
+          metadata: q.metadata ?? {},
         }))
       );
 
@@ -283,12 +290,15 @@ function EditClient({ quiz, questions: initialQuestions }: EditClientProps) {
                 Добавить вопрос
               </Button>
               {showAddMenu && (
-                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-48 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
+                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-52 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
                   <button onClick={addBlankQuestion} className="w-full text-left px-4 py-3 text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition-colors border-b border-white/5">
                     📝 Ручной ввод
                   </button>
-                  <button onClick={() => {setShowTextImport(true); setShowAddMenu(false);}} className="w-full text-left px-4 py-3 text-sm text-indigo-400 hover:bg-indigo-500/10 transition-colors">
-                    ✨ Импорт текстом
+                  <button onClick={() => {setShowTextImport(true); setShowAddMenu(false);}} className="w-full text-left px-4 py-3 text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition-colors border-b border-white/5">
+                    📋 Импорт текстом
+                  </button>
+                  <button onClick={() => {setShowAIGenerateModal(true); setShowAddMenu(false);}} className="w-full text-left px-4 py-3 text-sm text-indigo-400 hover:bg-indigo-500/10 transition-colors">
+                    ✨ Сгенерировать с ИИ
                   </button>
                 </div>
               )}
@@ -338,6 +348,14 @@ function EditClient({ quiz, questions: initialQuestions }: EditClientProps) {
             {hasAnyMissing ? 'Заполните все правильные ответы' : ru.editQuiz}
           </Button>
         </div>
+
+        <AIGenerateModal
+          isOpen={showAIGenerateModal}
+          onClose={() => setShowAIGenerateModal(false)}
+          onQuestionsGenerated={handleAIQuestionsGenerated}
+          existingQuestions={questions.map((q) => q.text)}
+          initialTopic={title}
+        />
       </div>
     </div>
   );
